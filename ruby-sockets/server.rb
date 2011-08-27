@@ -1,7 +1,8 @@
 require 'socket'
 
-@con = TCPServer.open(3000)   # Socket to listen on port 2000
+@conn = TCPServer.open(3000)   # Socket to listen on port 3000
 @plates = Hash.new
+
 loop {                          # Servers run forever
   Thread.start(@conn.accept) do |client|
     client.puts(Time.now.ctime) # Send the time to the client
