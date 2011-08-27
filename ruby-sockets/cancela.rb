@@ -19,6 +19,7 @@ multicast_sender = UDPSocket.open
 multicast_sender.setsockopt(Socket::IPPROTO_IP, Socket::IP_TTL, [1].pack('i'))
 
 car_data_receiver = UDPSocket.new
+#FIXME isso aqui ta ruim, se deixar nil ou localhost nao funciona =/
 car_data_receiver.bind '192.168.10.3', CAR_COMMUNICATION_PORT
 
 loop {
