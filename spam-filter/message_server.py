@@ -16,13 +16,19 @@ class ServerI(Messages.Server):
 
     def setAsSpam(self, message, current=None):
 
+        for blacklisted_msg in self.__blacklist:
+            if (blacklisted_msg.domain == message.domain and 
+                blacklisted_msg.subject == message.subject and 
+                blacklisted_msg.body == message.body): 
+                return
+
         self.__blacklist.append(message)
         print('\n-- -- -- SPAM BLACKLIST UPDATE -- -- --')
         for msg in self.__blacklist:
-            print('domain[{0}] subject[{0}] body[{0}]')
+            print('domain[{m.domain}] subject[{m.subject}] body[{m.body}]'.format(m = message))
 
-        for client_prx in self.__clients:
-            client_prx.receiveSpamBlacklist(self.__blacklist) 
+        #for client_prx in self.__clients:
+            #client_prx.receiveSpamBlacklist(self.__blacklist) 
 
 
     def register(self, client_prx, current=None):

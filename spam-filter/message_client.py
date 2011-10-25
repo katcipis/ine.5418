@@ -10,6 +10,8 @@ class ClientI(Messages.Client):
     def __init__(self, communicator, adapter):
 
         Messages.Client.__init__(self)
+        self.__blacklist = []
+        self.__received_messages = []
 
         try:
             # Create a proxy for the server
@@ -35,11 +37,31 @@ class ClientI(Messages.Client):
 
     def receiveMessage(self, message, current=None):
         print('receiveMessage: message domain[{m.domain}] subject[{m.subject}] body[{m.body}]'.format(m = message))
-        
+        if message.domain in self.__blacklist:
+            print('receiveMessage: the message domain is marked as SPAM !!!')
 
+        for received_message in self.__received_messages:
+            if (message.subject == received_message.subject and
+                message.body == received_message.body):
+
+                print('receiveMessage: detected a SPAM message')
+                print('receiveMessage: blacklisting domain {0}'.format(message.domain))
+                self.__server_prx.setAsSpam(message)
+
+                if message.domain != received_message.domain:
+                    print('receiveMessage: also blacklisting domain {0}'.format(received_message.domain))
+                    self.__server_prx.setAsSpam(received_message)
+
+        self.__received_messages.append(message)
+                
+        
 
     def receiveSpamBlacklist(self, blacklist, current=None):
         print('receiveSpamBlacklist')
+        self.__blacklist = [message.domain for message in blacklist]
+        print('\n-- -- -- BLACKLISTED DOMAINS -- -- --')
+        for domain in self.__blacklist:
+            print(domain)
 
 
 class ClientApp(Ice.Application):
