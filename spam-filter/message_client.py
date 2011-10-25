@@ -36,9 +36,10 @@ class ClientI(Messages.Client):
 
 
     def receiveMessage(self, message, current=None):
-        print('receiveMessage: message domain[{m.domain}] subject[{m.subject}] body[{m.body}]'.format(m = message))
+        print('\nreceiveMessage: message domain[{m.domain}] subject[{m.subject}] body[{m.body}]'.format(m = message))
         if message.domain in self.__blacklist:
             print('receiveMessage: the message domain is marked as SPAM !!!')
+            return
 
         for received_message in self.__received_messages:
             if (message.subject == received_message.subject and
@@ -47,17 +48,16 @@ class ClientI(Messages.Client):
                 print('receiveMessage: detected a SPAM message')
                 print('receiveMessage: blacklisting domain {0}'.format(message.domain))
                 self.__server_prx.setAsSpam(message)
-
                 if message.domain != received_message.domain:
                     print('receiveMessage: also blacklisting domain {0}'.format(received_message.domain))
                     self.__server_prx.setAsSpam(received_message)
+                return
 
         self.__received_messages.append(message)
                 
-        
 
     def receiveSpamBlacklist(self, blacklist, current=None):
-        print('receiveSpamBlacklist')
+        print('\nreceiveSpamBlacklist')
         self.__blacklist = [message.domain for message in blacklist]
         print('\n-- -- -- BLACKLISTED DOMAINS -- -- --')
         for domain in self.__blacklist:

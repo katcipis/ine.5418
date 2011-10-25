@@ -27,8 +27,8 @@ class ServerI(Messages.Server):
         for msg in self.__blacklist:
             print('domain[{m.domain}] subject[{m.subject}] body[{m.body}]'.format(m = message))
 
-        #for client_prx in self.__clients:
-            #client_prx.receiveSpamBlacklist(self.__blacklist) 
+        for client_prx in self.__clients:
+            client_prx.begin_receiveSpamBlacklist(self.__blacklist) 
 
 
     def register(self, client_prx, current=None):
