@@ -38,11 +38,10 @@ class ServerApp (Ice.Application):
         # Terminate cleanly on receipt of a signal
         self.shutdownOnInterrupt()
 
-        # Create an object adapter (stored in the _adapter
-        # static members)
+        # Create an object adapter
         adapter = self.communicator().createObjectAdapterWithEndpoints("MessagesServer", "default -p 10000")
-        ServerI._adapter = adapter
         server = ServerI()
+        adapter.add(server, self.communicator().stringToIdentity("MessagesServerInstance"))
 
         # All objects are created, allow client requests now
         adapter.activate()
