@@ -18,11 +18,12 @@ class ClientI(Messages.Client):
             # Down-cast the proxy to a Server proxy
             self.__server_prx = Messages.ServerPrx.checkedCast(obj)
 
-            # Create an identity
+            # Create an identity - cant be a UUID since we must create a proxy on the sender
             self._id = Ice.Identity()
-            self._id.name = Ice.generateUUID()
+            self._id.name = 'MessagesClientInstance'
+           
+            #create a proxy for this client
             self.__client_prx = Messages.ClientPrx.uncheckedCast(adapter.add(self, self._id))
-          
             #register ourselves on the server ;-)
             self.__server_prx.register(self.__client_prx)
 
@@ -33,19 +34,21 @@ class ClientI(Messages.Client):
 
 
     def receiveMessage(self, message, current=None):
-        pass
+        print('receiveMessage: message domain[{m.domain}] subject[{m.subject}] body[{m.body}]'.format(m = message))
+        
 
 
     def receiveSpamBlacklist(self, blacklist, current=None):
-        pass
+        print('receiveSpamBlacklist')
 
 
 class ClientApp(Ice.Application):
 
-    def __init__(self, port):
+    def __init__(self, host, port):
 
         Ice.Application.__init__(self)
         self.__port = port
+        self.__host = host
 
 
     def run(self, args):
@@ -54,7 +57,7 @@ class ClientApp(Ice.Application):
 
         # Create an object adapter
         adapter = self.communicator().createObjectAdapterWithEndpoints("MessagesClient", 
-                                                                       "default -p " + self.__port)
+                                                                       "default -h {0} -p {1}".format(self.__host, self.__port))
         client = ClientI(self.communicator(), adapter)
 
         # All objects are created, allow client requests now
@@ -68,10 +71,10 @@ class ClientApp(Ice.Application):
 
         return 0
 
-if len(sys.argv) < 2:
-    print('Usage: {0} port'.format(sys.argv[0]))
+if len(sys.argv) < 3:
+    print('Usage: {0} host port'.format(sys.argv[0]))
     exit()
 
-print('Running client on port[{0}]'.format(sys.argv[1]))
-app = ClientApp(sys.argv[1])
+print('Running client on host[{0}] port[{1}]'.format(sys.argv[1], sys.argv[2]))
+app = ClientApp(sys.argv[1], sys.argv[2])
 sys.exit(app.main(sys.argv))

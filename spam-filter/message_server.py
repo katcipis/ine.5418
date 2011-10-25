@@ -41,6 +41,7 @@ class ServerApp (Ice.Application):
         # Create an object adapter
         adapter = self.communicator().createObjectAdapterWithEndpoints("MessagesServer", "default -p 10000")
         server = ServerI()
+        # The server id must be well know and human readable (not a UUID)
         adapter.add(server, self.communicator().stringToIdentity("MessagesServerInstance"))
 
         # All objects are created, allow client requests now
