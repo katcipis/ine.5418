@@ -1,4 +1,5 @@
 import os, sys, traceback, Ice
+import message_server
 
 Ice.loadSlice(os.path.join('slices', 'Message.ice'))
 
@@ -15,7 +16,7 @@ class ClientI(Messages.Client):
 
         try:
             # Create a proxy for the server
-            obj = communicator.stringToProxy("MessagesServerInstance:default -p 10000")
+            obj = communicator.stringToProxy("MessagesServerInstance:default -h {0} -p {1}".format(message_server.SERVER_HOST, message_server.SERVER_PORT))
 
             # Down-cast the proxy to a Server proxy
             self.__server_prx = Messages.ServerPrx.checkedCast(obj)
@@ -53,13 +54,16 @@ class ClientI(Messages.Client):
                     self.__server_prx.setAsSpam(received_message)
                 return
 
+        print('receiveMessage: message is not spam')
         self.__received_messages.append(message)
                 
 
     def receiveSpamBlacklist(self, blacklist, current=None):
-        print('\nreceiveSpamBlacklist')
+        if blacklist == []:
+            return
+
         self.__blacklist = [message.domain for message in blacklist]
-        print('\n-- -- -- BLACKLISTED DOMAINS -- -- --')
+        print('\n-- -- -- BLACKLISTED DOMAINS UPDATE -- -- --')
         for domain in self.__blacklist:
             print(domain)
 
@@ -93,10 +97,14 @@ class ClientApp(Ice.Application):
 
         return 0
 
-if len(sys.argv) < 3:
-    print('Usage: {0} host port'.format(sys.argv[0]))
-    exit()
 
-print('Running client on host[{0}] port[{1}]'.format(sys.argv[1], sys.argv[2]))
-app = ClientApp(sys.argv[1], sys.argv[2])
-sys.exit(app.main(sys.argv))
+if __name__ == '__main__':
+
+    if len(sys.argv) < 3:
+        print('Usage: {0} host port'.format(sys.argv[0]))
+        exit()
+
+    print('Running client on host[{0}] port[{1}]'.format(sys.argv[1], sys.argv[2]))
+    app = ClientApp(sys.argv[1], sys.argv[2])
+    sys.exit(app.main(sys.argv))
+

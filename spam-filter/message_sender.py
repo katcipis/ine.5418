@@ -39,6 +39,7 @@ class SenderApp(Ice.Application):
 
         return 0
 
+
 if len(sys.argv) < 6:
     print('Usage: {0} host port domain title body'.format(sys.argv[0]))
     exit()
