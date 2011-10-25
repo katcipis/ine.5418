@@ -7,15 +7,24 @@ import Messages
 
 class ClientI(Messages.Client):
 
-    def __init__(self, communicator):
+    def __init__(self, communicator, adapter):
 
         Messages.Client.__init__(self)
+
         try:
-            # Create a proxy for the root directory
+            # Create a proxy for the server
             obj = communicator.stringToProxy("MessagesServerInstance:default -p 10000")
 
-            # Down-cast the proxy to a Directory proxy
+            # Down-cast the proxy to a Server proxy
             self.__server_prx = Messages.ServerPrx.checkedCast(obj)
+
+            # Create an identity
+            self._id = Ice.Identity()
+            self._id.name = Ice.generateUUID()
+            self.__client_prx = Messages.ClientPrx.uncheckedCast(adapter.add(self, self._id))
+          
+            #register ourselves on the server ;-)
+            self.__server_prx.register(self.__client_prx)
 
         except:
             traceback.print_exc()
@@ -43,12 +52,10 @@ class ClientApp(Ice.Application):
         # Terminate cleanly on receipt of a signal
         self.shutdownOnInterrupt()
 
-        # Create an object adapter (stored in the _adapter
-        # static members)
+        # Create an object adapter
         adapter = self.communicator().createObjectAdapterWithEndpoints("MessagesClient", 
                                                                        "default -p " + self.__port)
-        ClientI._adapter = adapter
-        client = ClientI(self.communicator())
+        client = ClientI(self.communicator(), adapter)
 
         # All objects are created, allow client requests now
         adapter.activate()
