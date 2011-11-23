@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 import config, sys, message
 
 if __name__ == '__main__':
