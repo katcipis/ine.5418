@@ -12,6 +12,6 @@ if __name__ == '__main__':
 
     for participant in group:
         print('sending start to {ip}:{port}'.format(ip = participant['ip'], port = participant['port']))
-        message.send(participant['ip'], participant['port'], {'start:':messages})
+        message.send(participant['ip'], participant['port'], {'start':messages})
 
     print('done')

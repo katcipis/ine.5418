@@ -1,16 +1,4 @@
-import socket
-import config
-
-
-def wait_for_start (ip, port):
-    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    sock.bind((ip, port))
-    sock.listen(1)
-
-    conn, addr = sock.accept()
-    data = conn.recv(1024) #whatever, just a start ping
-    conn.close()
-
+import socket, config, message
 
 if __name__ == '__main__':
 
@@ -21,5 +9,5 @@ if __name__ == '__main__':
     ip = config.get_ip() 
 
     print('process {proc_id} waiting for start at {ip}:{port}'.format(ip = ip, port=port, proc_id = proc_id))
-    wait_for_start(ip, port)
-    print('starting process {proc_id}'.format(proc_id = proc_id))
+    start_message = message.receive(ip, port)
+    print('{proc_id} received {msg}'.format(proc_id = proc_id, msg = start_message))
