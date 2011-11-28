@@ -25,7 +25,7 @@ def send(ip, port, message):
     serialized_message = ''
     
     for k,v in message.iteritems():
-        serialized_message += k + str(_KEY_VALUE_SPLITTER) + v + str(_PAIR_SPLITTER)
+        serialized_message += str(k) + str(_KEY_VALUE_SPLITTER) + str(v) + str(_PAIR_SPLITTER)
 
     serialized_message = serialized_message[:-1]
 

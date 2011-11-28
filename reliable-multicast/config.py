@@ -1,3 +1,4 @@
+import os 
 
 _BASE_PORT = 7777
 _IP_ADDR   = '127.0.0.1'
@@ -7,6 +8,10 @@ _PARTICIPANT_SPLIT_STR = ':'
 
 def get_ip():
     return _IP_ADDR
+
+
+def reset_group():
+    os.remove(_GROUP_PARTICIPANTS_FILENAME)    
 
 
 def get_group():
