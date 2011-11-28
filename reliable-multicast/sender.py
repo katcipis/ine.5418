@@ -1,4 +1,4 @@
-import threading, timestamp, log
+import threading, timestamp, random, time, log
 
 
 class MulticastSender (object):
@@ -36,6 +36,7 @@ class Sender(threading.Thread):
         for i in range(self.__messages_count):
             log.log('Sender: sending message ' + str(i))
             self.__multicast_sender.atomic_multicast("message {0}".format(i))
+            time.sleep(random.random())
 
         log.log('Sender: ending')
 
