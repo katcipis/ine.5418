@@ -4,8 +4,8 @@ import threading, timestamp, log
 class LamportMessage(object):
 
     def __init__ (self, msg):
-        self._id = msg['id']
-        self._timestamp = msg['timestamp']
+        self._id = int(msg['id'])
+        self._timestamp = int(msg['timestamp'])
         self._message = msg['message']
 
     def __cmp__(self, other):
@@ -20,6 +20,9 @@ class LamportMessage(object):
             return 1
         return 0
 
+    def __str__(self):
+        return str({'timestamp': self._timestamp, 'message': self._message, 'id': self._id})
+
 
 class MulticastReceiver(object):
 
@@ -32,7 +35,7 @@ class MulticastReceiver(object):
         self.__transporter = transporter
 
 
-    def get_messages_on_arrival_order(self):
+    def get_messages_unordered(self):
         return self.__msgs_buffer
 
 
@@ -76,6 +79,14 @@ class Receiver(threading.Thread):
         self.__receive_msgs_count = receive_msgs_count
         self.__receiver = MulticastReceiver(proc_id, group, transporter)
         self.__transporter = transporter
+
+
+    def get_ordered(self):
+        return self.__receiver.get_messages_ordered()
+
+
+    def get_unordered(self):
+        return self.__receiver.get_messages_unordered()
 
 
     def run (self):

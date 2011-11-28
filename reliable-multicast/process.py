@@ -29,5 +29,19 @@ if __name__ == '__main__':
     sender.start()
 
     receiver.join()
-    log.log('process {proc_id} exited successfully'.format(proc_id = proc_id))
+    log.log('process {proc_id} generating logs'.format(proc_id = proc_id))
     config.reset_group()
+
+    not_ordered = open('unordered-msgs-' + str(proc_id) + '.log', 'w')
+    ordered = open('ordered-msgs-' + str(proc_id) + '.log', 'w')
+
+    for msg in receiver.get_unordered():
+        not_ordered.write(str(msg) + '\n')
+
+    for msg in receiver.get_ordered():
+        ordered.write(str(msg) + '\n')
+
+    not_ordered.close()
+    ordered.close()
+
+    log.log('process {proc_id} exiting successfully'.format(proc_id = proc_id))
