@@ -44,6 +44,8 @@ class MulticastReceiver(object):
 
     def atomic_deliver(self, msg):
         self.__lamport_msgs.append(LamportMessage(msg))
+        if (msg['id'] != self.__proc_id):
+            timestamp.update_timestamp(int(msg['timestamp']))
 
 
     def reliable_deliver(self, msg):
@@ -51,12 +53,13 @@ class MulticastReceiver(object):
             log.log('MulticastReceiver: already received message[{0}]'.format(msg))
             return
 
+        self.__msgs_buffer.append(msg)
+        self.atomic_deliver(msg)
+
         log.log('MulticastReceiver: received new message[{0}], multicasting it'.format(msg))
         for proc in self.__group:
             self.__transporter.send(proc['ip'], proc['port'], msg)
 
-        self.__msgs_buffer.append(msg)
-        self.atomic_deliver(msg)
         log.log('MulticastReceiver: done')
 
 
@@ -78,8 +81,9 @@ class Receiver(threading.Thread):
     def run (self):
         log.log('Receiver: starting')
         while (self.__receiver.received_msgs_size() != self.__receive_msgs_count):
-            log.log('Receiver: waiting for new message')
+            log.log('Receiver: received [{0}] msgs expect [{1}] msgs'.format(self.__receiver.received_msgs_size(), self.__receive_msgs_count))
             msg = self.__transporter.receive()
-            log.log('Receiver: got new message')
+            log.log('Receiver: received [{0}] msgs expect [{1}] msgs'.format(self.__receiver.received_msgs_size(), self.__receive_msgs_count))
             self.__receiver.reliable_deliver(msg)
+            log.log('Receiver: received [{0}] msgs expect [{1}] msgs'.format(self.__receiver.received_msgs_size(), self.__receive_msgs_count))
             

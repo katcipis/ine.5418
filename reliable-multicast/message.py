@@ -12,21 +12,30 @@ class MessageTransporter(object):
         self.__receive_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.__receive_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         self.__receive_socket.bind((ip, port))
-        self.__receive_socket.listen(1)
+        self.__receive_socket.listen(128)
+
+
+    def __del__(self):
+        self.__receive_socket.shutdown(socket.SHUT_RDWR)
+        self.__receive_socket.close()
 
 
     def receive (self):
+        log.log('MessageTransporter: accepting connection')
         conn, addr = self.__receive_socket.accept()
+        log.log('MessageTransporter: accepted connection')
         data = conn.recv(4096) 
+        log.log('MessageTransporter: received data[{0}]'.format(data))
         conn.close()
 
-        message = {}
+        msg = {}
         pairs = data.split(_PAIR_SPLITTER)
         for pair in pairs:
             k, v = pair.split(_KEY_VALUE_SPLITTER)
-            message[k] = v
+            msg[k] = v
 
-        return message
+        log.log('MessageTransporter: received message[{0}]'.format(msg))
+        return msg
     
 
     def send(self, ip, port, message):
@@ -37,12 +46,13 @@ class MessageTransporter(object):
 
         serialized_message = serialized_message[:-1]
         try:
+            log.log('MessageTransporter:send: sending message[{0}]'.format(message))
             send_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             send_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
             send_socket.connect((ip, port))
             send_socket.send(serialized_message)
-            send_socket.shutdown(socket.SHUT_RDWR)
             send_socket.close()
+            log.log('MessageTransporter:send: success sending message[{0}]'.format(message))
         except:
             log.log('MessageTransporter:send: unable to send message to ip[{0}] port[{1}]'.format(ip, port))
-            traceback.log.log_exc()
+            traceback.print_exc()

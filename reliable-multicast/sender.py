@@ -10,7 +10,6 @@ class MulticastSender (object):
 
 
     def reliable_multicast (self, msg):
-        log.log('MulticastSender: group: ' + len(self.__group))
         for proc in self.__group:
             log.log('MulticastSender: sending msg[{msg}] to ip[{ip}] port[{port}]'.format(msg=msg, ip=proc['ip'], port=proc['port']))
             self.__transporter.send(proc['ip'], proc['port'], msg)

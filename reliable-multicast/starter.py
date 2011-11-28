@@ -20,5 +20,4 @@ if __name__ == '__main__':
         print('sending start to {ip}:{port}'.format(ip = participant['ip'], port = participant['port']))
         message_trans.send(participant['ip'], participant['port'], {'start':messages})
 
-    config.reset_group()
     print('done')

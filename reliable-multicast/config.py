@@ -11,7 +11,10 @@ def get_ip():
 
 
 def reset_group():
-    os.remove(_GROUP_PARTICIPANTS_FILENAME)    
+    try:
+        os.remove(_GROUP_PARTICIPANTS_FILENAME)    
+    except:
+        pass
 
 
 def get_group():
@@ -30,7 +33,8 @@ def get_group():
     return group
 
 
-def get_available_port (group):
+def get_available_port ():
+    group = get_group()
     port = _BASE_PORT
     for participant in group:
         if participant['port'] == port:

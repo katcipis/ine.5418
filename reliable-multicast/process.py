@@ -6,8 +6,7 @@ from message import MessageTransporter
 
 if __name__ == '__main__':
 
-    group = config.get_group()
-    port = config.get_available_port(group)
+    port = config.get_available_port()
     config.insert_proc_on_group (port)
     proc_id = config.get_uuid()
     ip = config.get_ip()
@@ -17,6 +16,7 @@ if __name__ == '__main__':
     start_message = transporter.receive()
     log.log('{proc_id} received start message:[{msg}]'.format(proc_id = proc_id, msg = start_message))
 
+    group = [proc for proc in config.get_group() if proc['port'] != port]
     send_msgs_count = int(start_message['start'])
 
     #starting receiver thread
@@ -30,3 +30,4 @@ if __name__ == '__main__':
 
     receiver.join()
     log.log('process {proc_id} exited successfully'.format(proc_id = proc_id))
+    config.reset_group()
