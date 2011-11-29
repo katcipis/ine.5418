@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-import socket, config
+import socket, config, time
 import sender, receiver, log
 from message import MessageTransporter
 
@@ -18,6 +18,8 @@ if __name__ == '__main__':
 
     group = [proc for proc in config.get_group() if proc['port'] != port]
     send_msgs_count = int(start_message['start'])
+
+    time.sleep(3)
 
     #starting receiver thread
     received_msgs_count = (len(group) + 1) * send_msgs_count
